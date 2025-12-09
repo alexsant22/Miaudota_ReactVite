@@ -3,13 +3,13 @@ const { executeQuery } = require("../database/pool");
 class PetModel {
   static async findAll(filters = {}) {
     let sql = `
-            SELECT p.*, 
-                   u.name as creator_name,
-                   u.email as creator_email
-            FROM pets p
-            LEFT JOIN users u ON p.created_by = u.id
-            WHERE 1=1
-        `;
+      SELECT p.*, 
+             u.name as creator_name,
+             u.email as creator_email
+      FROM pets p
+      LEFT JOIN users u ON p.created_by = u.id
+      WHERE 1=1
+    `;
     const params = [];
 
     // Aplicar filtros
@@ -58,27 +58,27 @@ class PetModel {
 
   static async findById(id) {
     const sql = `
-            SELECT p.*, 
-                   u.name as creator_name,
-                   u.email as creator_email,
-                   u.phone as creator_phone
-            FROM pets p
-            LEFT JOIN users u ON p.created_by = u.id
-            WHERE p.id = ?
-        `;
+      SELECT p.*, 
+             u.name as creator_name,
+             u.email as creator_email,
+             u.phone as creator_phone
+      FROM pets p
+      LEFT JOIN users u ON p.created_by = u.id
+      WHERE p.id = ?
+    `;
     const pets = await executeQuery(sql, [id]);
     return pets[0];
   }
 
   static async create(petData) {
     const sql = `
-            INSERT INTO pets (
-                name, species, breed, age, age_unit, gender, size, weight,
-                description, health_info, temperament, location, status,
-                is_vaccinated, is_dewormed, is_castrated, 
-                image_url, additional_images, created_by
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `;
+      INSERT INTO pets (
+        name, species, breed, age, age_unit, gender, size, weight,
+        description, health_info, temperament, location, status,
+        is_vaccinated, is_dewormed, is_castrated, 
+        image_url, additional_images, created_by
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
 
     const result = await executeQuery(sql, [
       petData.name,
@@ -109,14 +109,14 @@ class PetModel {
 
   static async update(id, petData) {
     const sql = `
-            UPDATE pets 
-            SET name = ?, species = ?, breed = ?, age = ?, age_unit = ?, 
-                gender = ?, size = ?, weight = ?, description = ?, 
-                health_info = ?, temperament = ?, location = ?, status = ?,
-                is_vaccinated = ?, is_dewormed = ?, is_castrated = ?,
-                image_url = ?, additional_images = ?, updated_at = CURRENT_TIMESTAMP
-            WHERE id = ?
-        `;
+      UPDATE pets 
+      SET name = ?, species = ?, breed = ?, age = ?, age_unit = ?, 
+          gender = ?, size = ?, weight = ?, description = ?, 
+          health_info = ?, temperament = ?, location = ?, status = ?,
+          is_vaccinated = ?, is_dewormed = ?, is_castrated = ?,
+          image_url = ?, additional_images = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `;
 
     await executeQuery(sql, [
       petData.name,
@@ -153,25 +153,25 @@ class PetModel {
 
   static async getSpeciesCount() {
     const sql = `
-            SELECT species, COUNT(*) as count 
-            FROM pets 
-            WHERE status = 'disponivel' 
-            GROUP BY species 
-            ORDER BY count DESC
-        `;
+      SELECT species, COUNT(*) as count 
+      FROM pets 
+      WHERE status = 'disponivel' 
+      GROUP BY species 
+      ORDER BY count DESC
+    `;
     return await executeQuery(sql);
   }
 
   static async getStats() {
     const sql = `
-            SELECT 
-                COUNT(*) as total_pets,
-                SUM(CASE WHEN status = 'disponivel' THEN 1 ELSE 0 END) as available_pets,
-                SUM(CASE WHEN status = 'adotado' THEN 1 ELSE 0 END) as adopted_pets,
-                SUM(CASE WHEN species = 'Cachorro' THEN 1 ELSE 0 END) as dogs,
-                SUM(CASE WHEN species = 'Gato' THEN 1 ELSE 0 END) as cats
-            FROM pets
-        `;
+      SELECT 
+        COUNT(*) as total_pets,
+        SUM(CASE WHEN status = 'disponivel' THEN 1 ELSE 0 END) as available_pets,
+        SUM(CASE WHEN status = 'adotado' THEN 1 ELSE 0 END) as adopted_pets,
+        SUM(CASE WHEN species = 'Cachorro' THEN 1 ELSE 0 END) as dogs,
+        SUM(CASE WHEN species = 'Gato' THEN 1 ELSE 0 END) as cats
+      FROM pets
+    `;
     const stats = await executeQuery(sql);
     return stats[0];
   }
